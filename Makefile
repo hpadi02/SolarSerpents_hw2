@@ -1,6 +1,19 @@
+# Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -O2
-LDFLAGS = $(shell pkg-config --libs openssl)
+
+# OpenSSL linking: prefer pkg-config (which may provide include/link flags),
+# but fall back to explicitly linking libssl and libcrypto if pkg-config is
+# not present. On Linux this usually works; on Windows (MinGW/MSYS) you may
+# need to install the mingw-w64 OpenSSL package and adjust LDFLAGS to link
+# against the MinGW-provided libraries (or build in WSL to avoid Windows
+# portability work).
+PKG_OPENSSL := $(shell pkg-config --libs openssl 2>/dev/null || true)
+ifeq ($(PKG_OPENSSL),)
+LDFLAGS = -lssl -lcrypto
+else
+LDFLAGS = $(PKG_OPENSSL)
+endif
 
 BIN = http_client
 SRC_DIR = src
