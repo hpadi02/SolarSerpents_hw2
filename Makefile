@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -O2
-LDFLAGS =
+LDFLAGS = $(shell pkg-config --libs openssl)
 
 BIN = http_client
 SRC_DIR = src
