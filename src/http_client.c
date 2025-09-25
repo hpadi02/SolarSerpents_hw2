@@ -407,16 +407,6 @@ int main(int argc, char **argv) {
         free_url_parts(&u);
         return 7;
     }
-
-    // Read response. Separate headers and body by looking for CRLFCRLF
-    const size_t buf_size = 8192;
-    /* Open output file for binary writing. */
-    FILE *out = fopen(out_path, "wb");
-    if (!out) {
-        fprintf(stderr, "Failed to open output file '%s': %s\n", out_path, strerror(errno));
-        goto cleanup_and_error;
-    }
-
     /*
      * Read response from the socket/SSL. We accumulate bytes until we find
      * the header/body separator "\r\n\r\n". After the separator, the
@@ -432,7 +422,7 @@ int main(int argc, char **argv) {
 
     ssize_t nread;
     while ((nread = recv_ssl(sockfd, ssl, buffer, buf_size)) > 0) {
-        size_t off = 0;
+        // size_t off = 0;
         if (!headers_parsed) {
             /* Append to header_accum, but protect against overflow */
             size_t to_copy = (size_t)nread;
@@ -519,5 +509,6 @@ cleanup_and_error:
     if (sockfd >= 0) close(sockfd);
     free_url_parts(&u);
     return 1;
+}
 
 
